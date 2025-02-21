@@ -9,11 +9,11 @@ class Sensor:
         self.sensor = None
         self.model = None
         self.dmin = 0
-        self.dmax = 0
-        self.ares = 0
+        self.dmax = 30000
+        self.ares = 1080
         self.amin = 0
-        self.amax = 0
-        self.afrt = 0
+        self.amax = 1080
+        self.afrt = 540
 
     def create_connection(self, max_retries=5):
         attempt = 0
@@ -67,10 +67,17 @@ class Sensor:
         info_dict = self.parse_sensor_info(data)
         return info_dict
     
-    def send_d_cmd(self, cmd="GD", startStep=0, endStep=1080):
+    def send_d_cmd(self, cmd="GD", startStep=0, endStep=1080, cluster=0, skip=0, limit=0):
         if startStep < self.amin or endStep > self.amax:
             return None
-        d_cmd = cmd.encode("utf-8")
+        str_startStep = '{:04d}'.format(startStep)
+        str_endStep = '{:04d}'.format(endStep)
+        str_cluster = '{:02d}'.format(cluster)
+        d_cmd = (cmd + str_startStep + str_endStep + str_cluster).encode("utf-8") + b'\r\n'
+        self.sensor.sendall(d_cmd)
+        data = self.getResponse()
+        data_dict = self.parse_data(data)
+        return data_dict
     
     def parse_sensor_info(self, sensor_info):
         info_dict = {}
@@ -78,7 +85,7 @@ class Sensor:
         if lines:
             info_dict["Echo"] = lines[0]
         if len(lines) > 1:
-            info_dict["Status"] = lines[1][:2]
+            info_dict["Status"] = lines[1][:-1]
         for line in lines[2:]:
             if ':' in line:
                 key, rest = line.split(":", 1)
@@ -88,6 +95,19 @@ class Sensor:
                     value = rest
                 info_dict[key.strip()] = value.strip()
         return info_dict
+
+    def parse_data(self, data):
+        lines = data.split('\n')
+        result = {}
+        if len(lines) >= 1:
+            result["Echo"] = lines[0]
+        if len(lines) >= 2:
+            result["Status"] = lines[1][:-1]
+        if len(lines) >= 3:
+            result["Timestamp"] = lines[2][:-1]
+        if len(lines) >= 4:
+            result["Data"] = "".join([line[:-1] for line in lines[3:] if line != ''])
+        return result
 
     def getResponse(self):
         response = b''
@@ -105,7 +125,7 @@ class Sensor:
 def setup_LiDAR(ip_address='192.168.0.10', port=10940, max_attempts=5):
     sensor = Sensor(ip_address=ip_address, port=port)
     if sensor.create_connection() is None:
-        raise ConnectionError(f"Unable to connect to LiDAR sensor at {ip_address}:{port}")
+        return False, None
 
     attempts = 0
     while attempts < max_attempts:
@@ -115,13 +135,14 @@ def setup_LiDAR(ip_address='192.168.0.10', port=10940, max_attempts=5):
             bm_info = sensor.send_p_cmd(cmd="BM")
             if bm_info["Status"] == "00":
                 print("Laser activated successfully.")
-                return sensor
+                return True, sensor
         time.sleep(1)
         attempts += 1
-
-    raise TimeoutError("Failed to activate LiDAR laser within allowed attempts.")
+    return False, None
 
 
 if __name__ == "__main__":
-    sensor = setup_LiDAR()
+    flag, sensor = setup_LiDAR()
+    data = sensor.send_d_cmd()
+    print(data)
 
