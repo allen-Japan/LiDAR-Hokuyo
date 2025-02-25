@@ -120,7 +120,10 @@ def main(ip_address=ip_address, port=port, connection_max_attempts=connection_ma
             cluster_line_artists = [] 
             if overall_marker_artist is not None:
                 overall_marker_artist.remove()
-                overall_marker_artist = None    
+                overall_marker_artist = None   
+            if info_text_obj is not None:
+                info_text_obj.remove()
+                info_text_obj = None 
             
             # DBSCANによるクラスタリング
             if not high_reflectors_distance.empty:
