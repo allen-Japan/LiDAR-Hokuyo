@@ -67,6 +67,7 @@ def main(ip_address=ip_address, port=port, connection_max_attempts=connection_ma
         high_reflectors_distance.loc[:, "Intensity"] = df_intensity.loc[mask, "Intensity"].values
 
         cluster_centers = []
+        info_string = "No clusters detected."
         # DBSCANによるクラスタリング
         if not high_reflectors_distance.empty:
             cluster_centers, high_reflectors = plot_xy_data.clusterling_circle(
@@ -93,8 +94,7 @@ def main(ip_address=ip_address, port=port, connection_max_attempts=connection_ma
                     f"Overall Center: (x: {overall_center[0]:.2f}, y: {overall_center[1]:.2f})\n"
                     f"{clusters_info}"
                 )
-            else:
-                info_string = "No clusters detected."
+                
 
         prev_time, fps_string = plot_xy_data.calc_fps(prev_time=prev_time)
         print(fps_string)
