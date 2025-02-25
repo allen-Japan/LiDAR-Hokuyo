@@ -1,0 +1,7 @@
+eps: 50
+min_samples: 3
+threshold_intensity_min: 4000
+threshold_distance_dead: 200
+ip_address: '192.168.0.10'
+port: 10940
+connection_max_attempts: 5

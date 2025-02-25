@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+import numpy as np
 
 def set_plt():
     plt.ion()  # 対話モードを有効にする
@@ -65,8 +67,8 @@ def weight_point(cluster_centers):
     else:
         line_distance = 0.0
     
-    # 各クラスタ重心から全体中心までの平均距離
-    center_distances = np.linalg.norm(sorted_centers - overall_center, axis=1)
+    # 各クラスタ重心から原点までの距離を計算
+    center_distances = np.linalg.norm(sorted_centers, axis=1)
     average_center_distance = np.mean(center_distances)
     
     # 直線の回転角度（水平からの角度：最初と最後のクラスタ重心の角度）

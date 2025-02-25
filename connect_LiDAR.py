@@ -122,13 +122,13 @@ class Sensor:
         response = response.decode()
         return response
 
-def setup_LiDAR(ip_address='192.168.0.10', port=10940, max_attempts=5):
+def setup_LiDAR(ip_address='192.168.0.10', port=10940, connection_max_attempts=5):
     sensor = Sensor(ip_address=ip_address, port=port)
     if sensor.create_connection() is None:
         return False, None
 
     attempts = 0
-    while attempts < max_attempts:
+    while attempts < connection_max_attempts:
         sensor.update_sensorInfo()
         ii_info = sensor.send_p_cmd(cmd="II")
         if ii_info["LASR"] == "OFF":
