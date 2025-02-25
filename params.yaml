@@ -5,3 +5,4 @@ threshold_distance_dead: 200
 ip_address: '192.168.0.10'
 port: 10940
 connection_max_attempts: 5
+flag_for_drawing: True
