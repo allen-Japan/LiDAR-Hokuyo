@@ -12,15 +12,15 @@ with open("params.yaml", "r") as f:
 
 eps = params["eps"]
 min_samples = params["min_samples"]
-threshold_intensity_min = params["threshold_intensity_min"]
+threshold_intensity_at500mm = params["threshold_intensity_at500mm"]
 threshold_distance_dead = params["threshold_distance_dead"]
 ip_address = params['ip_address']
 port = params['port']
 connection_max_attempts = params['connection_max_attempts']
 flag_for_drawing = params["flag_for_drawing"]
 
-
-def main(ip_address=ip_address, port=port, connection_max_attempts=connection_max_attempts, eps=eps, min_samples=min_samples, threshold_intensity_min=threshold_intensity_min, threshold_distance_dead=threshold_distance_dead):
+def main(ip_address=ip_address, port=port, connection_max_attempts=connection_max_attempts, eps=eps, min_samples=min_samples, 
+         threshold_intensity_at500mm=threshold_intensity_at500mm, threshold_distance_dead=threshold_distance_dead):
 
     flag_connect, sensor = connect_LiDAR.setup_LiDAR(
         ip_address=ip_address, 
@@ -58,7 +58,7 @@ def main(ip_address=ip_address, port=port, connection_max_attempts=connection_ma
         df_intensity["Distance"] = df_distance["Distance"]
         df_intensity = threshold_intensity.apply_threshold(
             df=df_intensity, 
-            threshold_intensity_min=threshold_intensity_min, 
+            threshold_intensity_at500mm=threshold_intensity_at500mm, 
             threshold_distance_dead=threshold_distance_dead)
         
         mask = df_intensity["Threshold"].notna() & (df_intensity["Intensity"] > df_intensity["Threshold"])
