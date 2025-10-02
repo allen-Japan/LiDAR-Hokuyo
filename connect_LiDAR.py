@@ -136,6 +136,9 @@ def setup_LiDAR(ip_address='192.168.0.10', port=10940, connection_max_attempts=5
             if bm_info["Status"] == "00":
                 print("Laser activated successfully.")
                 return True, sensor
+        elif ii_info["LASR"] == "ON":
+            return True, sensor
+            
         time.sleep(1)
         attempts += 1
     return False, None
